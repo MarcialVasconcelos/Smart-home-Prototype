@@ -1,0 +1,1 @@
+docker run -d -p 8123:8123 --name home-assis homeassistant/home-assistant

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle das Salas</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+    <!-- <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script> -->
+    <script src="mqtt_WebSockets.js" type="text/javascript"></script>
+</head>
+<body>
+
+    <div class="wrapper">
+        <h1>MQTT Broker</h1>
+        <form id="connection-information-form">
+           <b>Hostname or IP Address:</b> 
+           <input id="host" type="text" name="host" value="broker.emqx.io"><br>
+           <b>Port:</b>
+           <input id="port" type="text" name="port" value="8083"><br>
+           <input type="button" onclick="mqttConnect()" value="Connect">
+           <input type="button" onclick="mqttDisconnect()" value="Disconnect">
+        </form><br><br>
+        <form id="subscriotion-form">
+            <b>Topic:</b>
+            <input id="topic" type="text" name="topic" value="Room02"><br>
+            <input type="button" onclick="subscribe()" value="Subscribe">
+            <input type="button" onclick="unsubscribe()" value="Unsubscribe">            
+        </form><br><br>
+        <div id="messages"></div>
+    </div>
+
+    <div class="panel">
+        <h1>Room Control</h1>
+
+        <h2>Room 01</h2>
+        <div style="display:flex; flex-direction:row; width: max-content; align-items: center;">
+            <div id="LAMP10"  class="led"></div>
+            Lamp 00: 
+            <button id="btn001" onclick="publish('esp8266/1', [1,1,1])">ON</button>
+            <button id="btn000" onclick="publish('esp8266/1', [1,1,0])">OFF</button>
+        </div><br>
+        <div style="display:flex; flex-direction:row; width: max-content; align-items: center;">
+            <div>Servo Motor: </div>
+            <input type="range" style="margin-left: 5px;"
+            max="180" min="0" onchange="publish('esp8266/1', [2,value])">
+            <div id="ANGLE" class="DisplaySmall">X°</div><br>
+        </div><br>
+
+
+        <h2>Room 02</h2>
+        <div style="display:flex; flex-direction:row; width: max-content">
+            <div id="LAMP20" class="led""></div>
+            Lamp 00: 
+            <button id="btn001" onclick="publish('Room02', [0,0,1])">ON</button>
+            <button id="btn000" onclick="publish('Room02', [0,0,0])">OFF</button>
+        </div><br>
+        <div style="display:flex; flex-direction:row; width: max-content">
+            <div id="LAMP21" class="led"></div>
+            Lamp 01: 
+            <button id="btn011" onclick="publish('Room02', [0,1,1])">ON</button>
+            <button id="btn010" onclick="publish('Room02', [0,1,0])">OFF</button>
+        </div><br>
+        <div style="display:flex; flex-direction:row; width: max-content">
+            <div id="LAMP22" class="led"></div>
+            Lamp 02: 
+            <button id="btn021" onclick="publish('Room02', [0,2,1])">ON</button>
+            <button id="btn020" onclick="publish('Room02', [0,2,0])">OFF</button>
+        </div><br>
+        <div style="display:flex; flex-direction:row; width: max-content">
+            <div id="LAMP23" class="led"></div>
+            Lamp 03: 
+            <button id="btn031" onclick="publish('Room02', [0,3,1])">ON</button>
+            <button id="btn030" onclick="publish('Room02', [0,3,0])">OFF</button>
+        </div><br>
+        <div style="display:flex; flex-direction:row; width: max-content">
+            <div id="LOCK2" class="led"></div>
+            Lock: 
+            <button id="btn101" onclick="publish('Room02', [1,0,1])">LOCK</button>
+            <button id="btn100" onclick="publish('Room02', [1,0,0])">UNLOCK</button>
+        </div><br>
+        <div style="display:flex; flex-direction:row; width: max-content;">
+            <div id="DOOR2" class="led"></div>
+            Door: 
+            <button id="btn201" onclick="publish('Room02', [2,0,1])">OPEN</button>
+            <button id="btn200" onclick="publish('Room02', [2,0,0])">CLOSE</button>
+        </div><br>
+
+        <h2>Room 03</h2>
+        <div style="display:flex; flex-direction:row; width: max-content">
+            <div id="PARTY" class="led"></div>
+            Modo Festa: 
+            <button id="btnPartyOn"  onclick="publishString('topico_breno_sub', 'FESTA ON')" >ON </button>
+            <button id="btnPartyOff" onclick="publishString('topico_breno_sub', 'FESTA OFF')">OFF</button>
+        </div><br>
+        <div style="display:flex; flex-direction:row; width: max-content">
+            <div id="LAMP31" class="led"></div>
+            Lamp 01: 
+            <button id="btn011" onclick="publishString('topico_breno_sub', 'LED1 ON')">ON</button>
+            <button id="btn010" onclick="publishString('topico_breno_sub', 'LED1 OFF')">OFF</button>
+        </div><br>
+        <div style="display:flex; flex-direction:row; width: max-content">
+            <div id="LAMP32" class="led"></div>
+            Lamp 02: 
+            <button id="btn021" onclick="publishString('topico_breno_sub', 'LED2 ON')">ON</button>
+            <button id="btn020" onclick="publishString('topico_breno_sub', 'LED2 OFF')">OFF</button>
+        </div><br>
+        <div style="display:flex; flex-direction:row; width: max-content">
+            <div id="LAMP33" class="led"></div>
+            Lamp 03: 
+            <button id="btn031" onclick="publishString('topico_breno_sub', 'LED3 ON')">ON</button>
+            <button id="btn030" onclick="publishString('topico_breno_sub', 'LED3 OFF')">OFF</button>
+        </div><br>
+        
+        <div style="display:flex; flex-direction:row; width: max-content; align-items: center;">
+            <div>Temperature:</div>
+            <div id="temp" class="Display">No Info</div><br>
+        </div><br>
+
+        <div style="display:flex; flex-direction:row; width: max-content; align-items: center;">
+            <div>Humidity:</div>
+            <div id="humi" class="Display">No Info</div><br>
+        </div>
+    </div>
+
+</body>
+<footer>
+    <!-- <a href="https://www.flaticon.com/free-icons/lamp" title="lamp icons">Lamp icons created by iconixar - Flaticon</a> -->
+</footer>
+</html>
